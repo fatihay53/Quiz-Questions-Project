@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Quiz-Questions</title>
+    <style>
+        .vertical-center {
+            min-height: 50%;
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .center {
+            margin: auto;
+            width: 60%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="content" style="min-height: 500px;">
+        <div style="text-align: center;margin-top: 220px;">
+            <button id="start" class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
+        </div>
+        <div id='quizPage' class="card" style="display: none;min-height: 500px;min-width: 100%; text-align: center; ">
+            <div class="alert alert-light" id="timerContent">
+                Timer: <h3 id='countdown'></h3>
+            </div>
+            <form id="questionBox" class="card-body" style="text-align: center;">
+
+
+            </form>
+            <div id='answerResponse' class="card-footer alert-secondary">
+                Please select an answer
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+
+        var questions = [
+            {
+                question: "What is the World Population ?",
+                answers: ["4 billion", "6.5 Billion", "7.5 Billion"],
+                correct: "7.5 Billion"
+            },
+            {
+                question: "How many countries are there in the world? ",
+                answers: ["175", "195", "205"],
+                correct: "195"
+            },
+            {
+                question: "How many official languages are spoken in the world?",
+                answers: ["6500", "4000", "5000"],
+                correct: "6500"
+            },
+            {
+                question: "How many continents are there in the world?",
+                answers: ["5", "6", "7"],
+                correct: "7"
+            },
+            {
+                question: "What is the population of Canada 2020?",
+                answers: ["33.5 Millions", "35.5 Millions", "37.5 Millions"],
+                correct: "37.5 Millions"
+            }
+        ]
+
+
+        var start = document.querySelector("#start");
+        var quizPage = document.querySelector("#quizPage");
+        var questionBox = document.querySelector("#questionBox");
+        var timerArea = document.getElementById("countdown");
+        var gameFinishTime = 60;
+        var questionNumber = 0;
+        var timeIntervalObj = null;
+
+        function startQuiz() {
+            start.style.display = "none";
+            quizPage.style.display = "block"
+            getTimer();
+            getNextQuestion(questionNumber);
+        }
+
+        function getNextQuestion(questionNumber = 0) {
+
+
+            if (questionNumber > 4) {
+                finishGame();
+            }
+
+            questionBox.innerHTML = "<h3>" + questions[questionNumber].question + "</h3>";
+            var answers = questions[questionNumber].answers;
+
+            for (var i = 0; i < answers.length; i++) {
+                var answer = answers[i]
+
+                questionBox.innerHTML += `<button id='${i}' onClick="checkAnswer(event,'${answer}','${i}')" class="btn btn-info" style="margin:5px;width: 200px;border-radius:15px">${answer}</button></br>`;
+            }
+        }
+
+        function checkAnswer(event, answer, correctId) {
+            event.preventDefault();
+
+            if (questions[questionNumber].correct === answer) {
+                questionNumber += 1;
+                var correctAnswer = document.getElementById(correctId);
+                correctAnswer.style.backgroundColor = "green";
+                setTimeout(function () { getNextQuestion(questionNumber) }, 500);
+            } else {
+                questionNumber += 1;
+                var correctAnswer = document.getElementById(correctId);
+                correctAnswer.style.backgroundColor = "red";
+                timeDecrease(10);
+                setTimeout(function () { getNextQuestion(questionNumber) }, 500);
+            }
+        }
+
+
+        function getTimer() {
+            timerArea.textContent = gameFinishTime;
+            timeIntervalObj = setInterval(timeDecrease, 1000);
+        }
+
+        function timeDecrease(byvalue = 1) { 
+            gameFinishTime -= byvalue;
+            if (gameFinishTime <= 0) {
+                gameFinishTime = 0;
+                finishGame();
+            }
+            timerArea.textContent = gameFinishTime;
+        }
+
+        function finishGame() {
+            questionBox.innerHTML = "Player Name:<input id='playerName' type='text'></input> </br><button class='btn btn-primary' onClick='save()'>Save</button>";
+            clearInterval(timeIntervalObj);
+        }
+        function save() {
+            var playerName = document.querySelector('#playerName').value;
+            questionBox.innerHTML = "Scores </br><p>" + playerName + ' : ' + timerArea.textContent + "</p>";
+            document.querySelector('#timerContent').style.display = 'none'
+            document.querySelector('#answerResponse').style.display = 'none'
+        }
+    </script>
+
+</body>
+
+</html>
